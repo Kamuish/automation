@@ -1,8 +1,12 @@
 
 import random
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+
+def main(filename, main_email, main_pw):
 
 
-def main(filename):
     info = {}
     names =[]
     with open(filename,'r') as file:
@@ -32,14 +36,44 @@ def main(filename):
         senders.remove(a)
         receivers.remove(b)
 
-    print(pairs)
+    
+    checks = {}
+    for j in names:
+        x = [0,0]
+        if j in pairs:
+            x[0]= 1
+        if j in pairs.values():
+            x[1] = 1
+        checks[j] = x
+    
+
+
+    server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+    server.ehlo()
+    server.login(main_email,main_pw)
+    fromaddr = main_email
+    subject = 'Secret friend!!'
 
     for key,value in pairs.items():
         if key ==value:
             print('fuck')
-        print(f"send mail from {info[key]} to {info[value]}")
+        receiver = info[value]
 
+        msg = MIMEMultipart()
+        msg['From'] = fromaddr
+        msg['To'] = receiver
+        msg['Subject'] = subject
+        
+         
+        body = f'{key}, your secret friend is {value}'
+        msg.attach(MIMEText(body, 'plain'))
+
+
+        server.sendmail(fromaddr, receiver, msg.as_string())
+    server.close()
+
+        
 
 
 if __name__ == '__main__':
-    main('emails.txt')
+    main('emails.txt','placeholder@pla.com','pw')
