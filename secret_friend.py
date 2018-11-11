@@ -4,9 +4,14 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-def main(filename, main_email, main_pw):
 
+def import_from_file(filename):
+    """
+    Extracts the names and emails from filename
 
+    :param: filename: path to file
+    :return: dict pairing names and emails and list of names
+    """
     info = {}
     names =[]
     with open(filename,'r') as file:
@@ -19,6 +24,43 @@ def main(filename, main_email, main_pw):
             else:
                 info[name[0]] = mail[0]
                 names.append(name[0])
+    return info,names
+
+def send_email(server,main_email,subject,gifter_name,gifter_email,receiver_name):
+    """
+    Sends an email notifying the receiver of the person he has to give a gift.
+
+    :param: server - email server
+    :param: main_email - email from which the emails will be sent
+    :param: subject - subject of the email
+    :param: gifter_name - name of the person sendin the gift
+    :param: gifter_email - email of the gifter
+    :param: receiver_name - name of the receiver
+
+    """
+
+    msg = MIMEMultipart()
+    msg['From'] = main_email
+    msg['To'] = gifter_email
+    msg['Subject'] = subject
+     
+    body = f'{gifter_name}, your secret friend is {receiver_name}'
+    msg.attach(MIMEText(body, 'plain'))
+
+    server.sendmail(main_email, gifter_email, msg.as_string())
+
+def main(filename, main_email, main_pw):
+    """
+    Randomly matches two persons for secret friend gifting. Each element will receive
+    an email with one name.
+
+    :param: filename: path to file with names and emails separated by a ";"
+    :param: main_email: email from which the notices will be sent. COnfigured for gmail
+    :param: main_pw: password for the email. Must be gmail's app password
+    :return:
+    """
+
+    info,names = import_from_file(filename)
 
 
     senders = names.copy()
@@ -51,25 +93,15 @@ def main(filename, main_email, main_pw):
     server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
     server.ehlo()
     server.login(main_email,main_pw)
-    fromaddr = main_email
     subject = 'Secret friend!!'
 
     for key,value in pairs.items():
         if key ==value:
-            print('fuck')
-        receiver = info[value]
+            print('OH GOD NO')
+            return
 
-        msg = MIMEMultipart()
-        msg['From'] = fromaddr
-        msg['To'] = receiver
-        msg['Subject'] = subject
+        send_email(server,main_email,subject,key,info[key],value)
         
-         
-        body = f'{key}, your secret friend is {value}'
-        msg.attach(MIMEText(body, 'plain'))
-
-
-        server.sendmail(fromaddr, receiver, msg.as_string())
     server.close()
 
         
