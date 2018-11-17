@@ -4,7 +4,6 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import imaplib
-
 from friend_db import manual_insert_user, insert_gift, has_match
 # https://stackoverflow.com/questions/18156485/receive-replies-from-gmail-with-smtplib-python
 
