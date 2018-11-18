@@ -6,6 +6,16 @@ from email.mime.text import MIMEText
 import imaplib
 from friend_db import manual_insert_user, insert_gift, has_match
 # https://stackoverflow.com/questions/18156485/receive-replies-from-gmail-with-smtplib-python
+from datetime import datetime
+import logging
+
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s -  %(levelname)s:%(name)s:%(message)s')
+file_handler = logging.FileHandler('db.log')
+file_handler.setFormatter(formatter)
+logger.addHandler(file_handler)
 
 
 def import_from_file(filename):
@@ -56,7 +66,9 @@ def send_email(server,main_email,subject,gifter_name,gifter_email,receiver_name)
 
     server.sendmail(main_email, gifter_email, msg.as_string())
 
-def main(filename, main_email, main_pw):
+
+
+def create_pairs(user_ids,year_thresh, main_email, main_pw):
     """
     Randomly matches two persons for secret friend gifting. Each element will receive
     an email with one name.
@@ -67,27 +79,33 @@ def main(filename, main_email, main_pw):
     :return:
     """
 
-    info,names = import_from_file(filename)
+    senders = user_ids.copy()
+    receivers = user_ids.copy()
 
-
-    senders = names.copy()
-    receivers = names.copy()
     pairs ={}
 
-    for j in range(len(names)):
-        a,b = 0,0
-        while a ==b:
+    for j in range(len(user_ids)):
+
+        a = random.choice(senders)
+        b = random.choice(receivers)
+        count = 0
+
+        while has_match(a,b,year_thresh) or a == b:
             a = random.choice(senders)
             b = random.choice(receivers)
+            count += 1
 
+            if count > 1000:
+                print("Could not find match")
+                logger.fatal('Could not find reliable matches')
+                return -1
         pairs[a] = b
 
         senders.remove(a)
         receivers.remove(b)
 
-    
     checks = {}
-    for j in names:
+    for j in user_ids:
         x = [0,0]
         if j in pairs:
             x[0]= 1
@@ -108,7 +126,7 @@ def main(filename, main_email, main_pw):
             return
 
         send_email(server,main_email,subject,key,info[key],value)
-        
+        insert_gift(key,value,datetime.now().year)
     server.close()
 
         

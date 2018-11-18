@@ -140,6 +140,11 @@ def has_match(gifter_id, receiver_id, start_year):
         print(e)
         pass
 
+def get_all_users():
+    result = session.query(Users).all()
+    return result
 
 if __name__ == '__main__':
-    print(select_user(2))
+    print(get_all_users())
+
+    print(has_match(1,2,2018))
