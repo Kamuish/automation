@@ -64,18 +64,17 @@ def manual_insert_user(name,email):
 
         if result_mail != []:
             print("Email  already exists")
-            logger.warning(f"Repated Email {email}")
+            logger.warning(f"Repeated Email {email}")
             return -1 
         if result_user != []:
-            logger.warning(f"Repated name {name}")
-            print("Name  already exists")
+            logger.warning(f"Repeated name {name}")
             return -1 
 
         user = Users(name = name,email = email)
         session.add(user)
         session.commit()
     except Exception as e:
-        print(e)
+        logger.error("Problem inserting user", exc_info=True)
         pass
 
 def select_user(user_id):
@@ -83,6 +82,8 @@ def select_user(user_id):
         result = session.query(Users).filter_by(id = user_id).all()
         return result[0]
     except:
+        logger.info(f"Couldn't find user with id {user_id}")
+
         return -1
 
 
@@ -110,7 +111,7 @@ def insert_gift(gifter_id,receiver_id,year = None):
             session.add(gift)
             session.commit()
     except Exception as e:
-        print(e)
+        logger.error("Problem inserting gift", exc_info=True)
         return -1
 
 
@@ -130,6 +131,9 @@ def has_match(gifter_id, receiver_id, start_year):
     
     result = list(session.execute(s))
     try:
+        if result == []:
+            return False
+            
         if result[-1] is not None:
             if  result[-1][1] >=  start_year:
                 return True
@@ -137,8 +141,8 @@ def has_match(gifter_id, receiver_id, start_year):
                 return False
 
     except Exception as e: 
-        print(e)
-        pass
+        logger.error("Problem searching for match", exc_info=True)
+        return -1
 
 def get_all_users():
     result = session.query(Users).all()
@@ -148,3 +152,4 @@ if __name__ == '__main__':
     print(get_all_users())
 
     print(has_match(1,2,2018))
+

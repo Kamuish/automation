@@ -4,7 +4,7 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import imaplib
-from friend_db import manual_insert_user, insert_gift, has_match
+from friend_db import manual_insert_user, insert_gift, has_match, select_user
 # https://stackoverflow.com/questions/18156485/receive-replies-from-gmail-with-smtplib-python
 from datetime import datetime
 import logging
@@ -124,8 +124,9 @@ def create_pairs(user_ids,year_thresh, main_email, main_pw):
         if key ==value:
             print('OH GOD NO')
             return
-
-        send_email(server,main_email,subject,key,info[key],value)
+        sender = select_user(key)
+        receiver = select_user(value)
+        send_email(server,main_email,subject,sender.name, sender.email,receiver.email)
         insert_gift(key,value,datetime.now().year)
     server.close()
 
@@ -134,3 +135,4 @@ def create_pairs(user_ids,year_thresh, main_email, main_pw):
 
 if __name__ == '__main__':
     main('emails.txt','placeholder@pla.com','pw')
+

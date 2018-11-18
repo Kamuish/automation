@@ -12,12 +12,12 @@ def populate_db():
 
 def send_mails(selection,email,pw):
     user_ids = [i + 1 for i in selection]
-    create_pairs(user_ids,2018,1,1)
+    create_pairs(user_ids,2018,email,pw)
 
 
 def main():
     window = tk.Tk()
-    window.geometry("250x150")
+    window.geometry("350x150")
     window.title("Secret_friend")
 
     but = tk.Button(window,text = 'Import from file', command = lambda: populate_db())
@@ -27,17 +27,20 @@ def main():
     users = get_all_users()
     [listbox.insert(tk.END,a.name) for a in users]
 
-    check = tk.Checkbutton(window,text = 'Use all')
+    def select_all():
+        listbox.select_set(0,tk.END)
+    check = tk.Button(window,text = 'Select all', command = lambda: select_all())
     
 
-    email = tk.Entry(window, width=15)
+    email = tk.Entry(window, width=30)
     email_lab = tk.Label(text = 'Email')
-    widget = tk.Entry(window,text = 'Password', show="*", width=15)
+    widget = tk.Entry(window,text = 'Password', show="*", width=30)
     widg_lab = tk.Label(text = 'Password')
-    year = tk.Entry(window,text = 'Last year', width=15)
+    year = tk.Entry(window,text = 'Last year', width=30)
     year_lab = tk.Label(text = 'year')
 
     send = tk.Button(window,text = 'Send', command = lambda: send_mails(listbox.curselection(),email.get(),widget.get()))
+
 
 
     year.grid(row = 1, column = 2)
@@ -49,14 +52,14 @@ def main():
     widget.grid(row = 3, column = 2)
     widg_lab.grid(row = 3, column =1)
 
-    but.grid(row = 0, column = 1, columnspan = 2)
+    but.grid(row = 0, column = 1, columnspan = 2, sticky = 'nsew')
 
     listbox.grid(row = 0, column = 0, rowspan = 5)
 
     
 
-    check.grid(row = 5, column = 0)
-    send.grid(row = 4, column = 1,columnspan = 2)
+    check.grid(row = 5, column = 0, sticky = 'nsew')
+    send.grid(row = 4, column = 1,columnspan = 2, sticky = 'nsew')
 
     window.mainloop()
 
