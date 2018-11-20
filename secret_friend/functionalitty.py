@@ -25,23 +25,14 @@ def import_from_file(filename):
     secret friend
     
     :param: filename: path to file
-    :return: dict pairing names and emails and list of names
     """
-    info = {}
-    names =[]
+ 
     with open(filename,'r') as file:
         for line in file:
             name,mail = line.split(';')
             name = name.split()
             mail = mail.split()
-            if name[0] in info or mail[0] in info.values():
-                print(f"User {name[0]}, with mail {mail[0]} already exists")
-            else:
-                info[name[0]] = mail[0]
-                names.append(name[0])
-                manual_insert_user(name[0],mail[0])
-
-    return info,names
+            manual_insert_user(name[0],mail[0])
 
 def send_email(server,main_email,subject,gifter_name,gifter_email,receiver_name):
     """
