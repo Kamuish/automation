@@ -58,6 +58,9 @@ Base.metadata.create_all(conn)
 
 
 def manual_insert_user(name,email):
+    """
+        Manually inserrt a db entry of a user
+    """
     try:
         result_mail = session.query(Users).filter_by(email = email).all()
         result_user = session.query(Users).filter_by(name = name).all()
@@ -77,17 +80,33 @@ def manual_insert_user(name,email):
         logger.error("Problem inserting user", exc_info=True)
         pass
 
-def select_user(user_id):
+def select_user(reference, method = 1):
+    """
+    reference: user_id if method == 1. if method == 2 then searches by email
+    method: If it's 1 then it uses user id to find the user. If it's 2 uses email
+    """
     try:
-        result = session.query(Users).filter_by(id = user_id).all()
+        if method == 1:
+            result = session.query(Users).filter_by(id = reference).all()
+        elif method == 2:
+            result = session.query(Users).filter_by(email = reference).all()
+
         return result[0]
     except:
-        logger.info(f"Couldn't find user with id {user_id}")
+        if method == 1:
+            logger.error(f"Couldn't find user with id {reference}")
+        elif method == 2:
+            logger.error(f"Couldn't find user with email {reference}")
 
         return -1
 
 
 def insert_gift(gifter_id,receiver_id,year = None):
+    """
+    gifter_id: id of the user giving the present
+    receiver_id: id of the user receiving the present
+    year: year in which the exchange was completed
+    """
     try:
         gifter = select_user(gifter_id)
         receiver = select_user(receiver_id)
@@ -118,7 +137,10 @@ def insert_gift(gifter_id,receiver_id,year = None):
 
 def has_match(gifter_id, receiver_id, start_year):
     """
-    time_span: number of years allowed between repeated gifts
+        Checks if gifter_id has given a present to receiver_id, beginning from start_year
+
+        If a match is found returns True, otherwise False
+    start_year: first year in which we want to avoid matches between users
     """
 
     s = session.query(Gifts).filter(
@@ -145,11 +167,22 @@ def has_match(gifter_id, receiver_id, start_year):
         return -1
 
 def get_all_users():
+    """
+        Retrieves all users on the db
+    """
     result = session.query(Users).all()
     return result
 
+def get_all_gifts():
+    """
+        Retrieves all users on the db
+    """
+    result = session.query(Gifts).all()
+    return result
+
+
 if __name__ == '__main__':
     print(get_all_users())
+    print(get_all_gifts())
 
-    print(has_match(1,2,2018))
 

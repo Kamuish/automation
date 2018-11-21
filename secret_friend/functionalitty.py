@@ -25,14 +25,51 @@ def import_from_file(filename):
     secret friend
     
     :param: filename: path to file
+
+    each line of the file should have the format:
+
+    username ; email
     """
  
     with open(filename,'r') as file:
         for line in file:
             name,mail = line.split(';')
-            name = name.split()
-            mail = mail.split()
-            manual_insert_user(name[0],mail[0])
+            name = name.strip()
+            mail = mail.strip()
+
+            manual_insert_user(name,mail)
+
+
+def import_gifts_from_file(filename):
+    """
+    Creates gifts on the database between the users with emails specified on
+    the database, on the specified year
+
+    :param: filename: path to file
+
+    each line of the file should have the format:
+
+        sender email ; receiver email; year
+    """
+ 
+    with open(filename,'r') as file:
+        for line in file:
+            try:
+                sender_mail,receiver_mail,year = line.split(';')
+                sender_mail = sender_mail.strip()
+                receiver_mail = receiver_mail.strip()
+                year = int(year.strip())
+
+                gifter = select_user(sender_mail, method = 2)
+                receiver = select_user(receiver_mail, method = 2)
+
+                insert_gift(gifter.id,receiver.id, year)
+            except:
+                logger.error("Couldn't extract gifts",exc_info=True)
+                return -1
+        return 0
+
+
 
 def send_email(server,main_email,subject,gifter_name,gifter_email,receiver_name):
     """
