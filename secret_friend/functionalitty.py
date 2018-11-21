@@ -154,7 +154,7 @@ def create_pairs(user_ids,year_thresh, main_email, main_pw):
             return
         sender = select_user(key)
         receiver = select_user(value)
-        send_email(server,main_email,subject,sender.name, sender.email,receiver.email)
+        send_email(server,main_email,subject,sender.name, sender.email,receiver.name)
         insert_gift(key,value,datetime.now().year)
     server.close()
 
