@@ -13,16 +13,19 @@ def start_connection():
 	return reddit
 
 
-def find_match(reddit,sub_name, chapter_number):
+def find_match(reddit, sub_name, chapter_number):
 	subreddit = reddit.subreddit(sub_name)
 
+
 	for submission in subreddit.hot():
-		if f'Chapter {chapter_number}' in submission.title :
+		if f'Chapter {chapter_number} - Links and Discussion' in submission.title :
 			print(submission.title)
+
+
 
 reddit = start_connection()
 find_match(reddit,'BokunoHeroAcademia',207)
-print(reddit.user.me())
+
 
 
 
