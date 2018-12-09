@@ -1,0 +1,12 @@
+This programs creates a easy way of doing secret friend gifts and saving thes gifts from each year on a local database. This way, we can allow/forbig
+matches between 2 people after a certain year.
+
+To add users, we have to import from a txt file with the format:
+username ; email
+
+for each user.
+
+We can also add past gifts to the database, by providing a file with the following format:
+
+email of sender ; email of receiver; year
+
