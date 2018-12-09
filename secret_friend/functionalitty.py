@@ -88,8 +88,13 @@ def send_email(server,main_email,subject,gifter_name,gifter_email,receiver_name)
     msg['From'] = main_email
     msg['To'] = gifter_email
     msg['Subject'] = subject
-     
-    body = f'{gifter_name}, your secret friend is {receiver_name}'
+    
+    if gifter_name == 'Nóbrega':
+        body = f'Cabeça de colhão, \n o teu amigo secreto é: {receiver_name}. As prendas vão até um limite de 5 euros.'
+    elif gifter_name == 'Rodrigues':
+        body = f'Caixa e óculos, \n o teu amigo secreto é: {receiver_name}. As prendas vão até um limite de 5 euros.'
+    else:
+        body = f'{gifter_name}, \n o teu amigo secreto é: {receiver_name}. As prendas vão até um limite de 5 euros.'
     msg.attach(MIMEText(body, 'plain'))
 
     server.sendmail(main_email, gifter_email, msg.as_string())
@@ -132,21 +137,19 @@ def create_pairs(user_ids,year_thresh, main_email, main_pw):
         senders.remove(a)
         receivers.remove(b)
 
-    checks = {}
-    for j in user_ids:
-        x = [0,0]
-        if j in pairs:
-            x[0]= 1
-        if j in pairs.values():
-            x[1] = 1
-        checks[j] = x
     
 
+    y = input('Mandar mails (y/n)?')
 
-    server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+    if y == 'n':
+        print('None sent')
+        return
+    print('Sending mails')
+
+    server = smtplib.SMTP_SSL('smtp.fc.up.pt', 465)
     server.ehlo()
     server.login(main_email,main_pw)
-    subject = 'Secret friend!!'
+    subject = 'Secret friend!! - Correção porque o Nobrega não sabe escrever o email dele sem erros'
 
     for key,value in pairs.items():
         if key ==value:
@@ -154,7 +157,7 @@ def create_pairs(user_ids,year_thresh, main_email, main_pw):
             return
         sender = select_user(key)
         receiver = select_user(value)
-        send_email(server,main_email,subject,sender.name, sender.email,receiver.email)
+        send_email(server,main_email,subject,sender.name, sender.email,receiver.name)
         insert_gift(key,value,datetime.now().year)
     server.close()
 
