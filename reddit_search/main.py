@@ -22,6 +22,6 @@ def main():
 	toaster = ToastNotifier()
 	toaster.show_toast("Things to read/see:",
 	                   "\n".join(matches),
-	                   duration=10)
+	                   duration=200)
 
 main()
