@@ -30,11 +30,15 @@ def insert_subreddit(name, last_chapter, title_style):
 		IF we wish to enter the template for bokunoheroacademia chapters, we do:
 			Chapter $ - Links and Discussion
 	"""
-	if conn.execute(select([chapters]).where(chapters.c.subreddit == name)).fetchall() != []:
-		return    # Avoids repetitions
+	find_equal = conn.execute(select([chapters]).where(chapters.c.subreddit == name)).fetchall()
+	allow = False
+	if find_equal != []:
+		for sub in find_equal: # avoids repetitions of equal title styles but allows tracking more than one instance from each sub
+			if sub[-1] == title_style:
+				return -1
 	command = chapters.insert().values(subreddit = name, chapter_number = last_chapter, title_style = title_style)
 	conn.execute(command)
-
+	return 0
 
 def get_all_subs():
 	"""
@@ -65,5 +69,4 @@ def update_subreddit(name):
 
 
 if __name__ == '__main__':
-	insert_subreddit('OnePiece',928,'One Piece: Chapter $')
-	print(get_template('BokunoHeroAcademia'))
+	print(insert_subreddit('OnePiece',928,'One Piece: Chapter $'))
