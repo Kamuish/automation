@@ -12,6 +12,7 @@ chapters = Table('chapters', metadata,
      Column('id', Integer, primary_key=True),
      Column('subreddit', String),
      Column('chapter_number', Integer),
+     Column('title_style', String),
 	 )
 
 
@@ -20,14 +21,20 @@ conn = engine.connect()
 
 
 
-def insert_subreddit(name, last_chapter):
+def insert_subreddit(name, last_chapter, title_style):
 	"""
 	Inserts a subreddit in the db, as well as the number of the last read chapter
+
+	Title style will be a fixed template, with $ in the place of the chapter number.
+
+		IF we wish to enter the template for bokunoheroacademia chapters, we do:
+			Chapter $ - Links and Discussion
 	"""
 	if conn.execute(select([chapters]).where(chapters.c.subreddit == name)).fetchall() != []:
 		return    # Avoids repetitions
-	command = chapters.insert().values(subreddit = name, chapter_number = last_chapter)
+	command = chapters.insert().values(subreddit = name, chapter_number = last_chapter, title_style = title_style)
 	conn.execute(command)
+
 
 def get_all_subs():
 	"""
@@ -36,6 +43,14 @@ def get_all_subs():
 
 	result = conn.execute(select([chapters])).fetchall()
 	return result
+
+def get_template(name):
+	"""
+		Returns the template for the subreddit "name"
+	"""
+	result = conn.execute(select([chapters]).where(chapters.c.subreddit == name)).fetchall()
+
+	return result[-1][-1]
 
 def update_subreddit(name):
 	"""
@@ -47,3 +62,8 @@ def update_subreddit(name):
 	conn.execute(stmt)
 	return result
 
+
+
+if __name__ == '__main__':
+	insert_subreddit('OnePiece',928,'One Piece: Chapter $')
+	print(get_template('BokunoHeroAcademia'))
